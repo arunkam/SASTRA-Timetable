@@ -378,6 +378,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int classroomEdit=0x7f040018;
         public static final int colorBT=0x7f040011;
         public static final int colorLabel=0x7f040023;
+        public static final int colorLabel2=0x7f040033;
         public static final int day=0x7f04001a;
         public static final int end=0x7f04001e;
         public static final int friday=0x7f04002a;
@@ -389,23 +390,24 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int labelSTeacher=0x7f04000e;
         public static final int labelSubject=0x7f040014;
         public static final int labelType=0x7f040015;
-        public static final int menu_settings=0x7f040036;
+        public static final int menu_settings=0x7f040038;
         public static final int monday=0x7f04002d;
         public static final int none=0x7f040000;
         public static final int ok=0x7f04001f;
         public static final int saturday=0x7f040032;
         public static final int start=0x7f04001c;
+        public static final int text1=0x7f040034;
         public static final int textView1=0x7f040006;
         public static final int textView2=0x7f040007;
-        public static final int thursday=0x7f040033;
+        public static final int thursday=0x7f040035;
         public static final int title_indicator=0x7f04002b;
         public static final int top=0x7f040004;
         public static final int triangle=0x7f040001;
-        public static final int tuesday=0x7f040034;
+        public static final int tuesday=0x7f040036;
         public static final int typeEdit=0x7f040016;
         public static final int underline=0x7f040002;
         public static final int view_pager=0x7f04002c;
-        public static final int wednesday=0x7f040035;
+        public static final int wednesday=0x7f040037;
     }
     public static final class integer {
         public static final int default_circle_indicator_orientation=0x7f070000;
@@ -427,9 +429,10 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int timetable_monday_fragment=0x7f030009;
         public static final int timetable_paperlist=0x7f03000a;
         public static final int timetable_saturday_fragment=0x7f03000b;
-        public static final int timetable_thursday_fragment=0x7f03000c;
-        public static final int timetable_tuesday_fragment=0x7f03000d;
-        public static final int timetable_wednesday_fragment=0x7f03000e;
+        public static final int timetable_spinner_layout=0x7f03000c;
+        public static final int timetable_thursday_fragment=0x7f03000d;
+        public static final int timetable_tuesday_fragment=0x7f03000e;
+        public static final int timetable_wednesday_fragment=0x7f03000f;
     }
     public static final class menu {
         public static final int activity_main=0x7f0b0000;

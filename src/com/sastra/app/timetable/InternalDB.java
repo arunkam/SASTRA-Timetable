@@ -169,6 +169,32 @@ public class InternalDB {
 		}
 	}
 	
+	public ArrayList<HashMap<String, Object>> selectSubjects2() {
+		SQLiteDatabase db = ourHelper.getWritableDatabase();
+		try {
+			ArrayList<HashMap<String, Object>> results =
+				new ArrayList<HashMap<String, Object>>();
+			Cursor c = db.rawQuery("select * from Subjects",null);
+			if (c.getCount() > 0) {
+				c.moveToFirst();
+				do {
+					HashMap<String,Object> resultsMap =
+						new HashMap<String, Object>();
+					resultsMap.put("SName" , c.getString(c.getColumnIndex("SName")));
+					resultsMap.put("SColor" , c.getString(c.getColumnIndex("SColor")));
+					results.add(resultsMap);
+				} while(c.moveToNext());
+			}
+			c.close();
+			return results;
+		} finally {
+			if(db!= null)
+				db.close();
+		}
+	}
+	
+	
+	
 	public void insertIntoHours(String SName, int HDay, String HType, String HClass, String HStart, String HEnd) {
 		SQLiteDatabase db = ourHelper.getWritableDatabase();
 		try {

@@ -13,6 +13,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +35,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
@@ -62,6 +65,8 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
 	    private static SimpleAdapter simpleAdapter;
 		private static String[] from = {"SName","SCode","STeacher","HType","HClass","HStart","HEnd"};
 	    private static int[] to = {R.id.SName,R.id.SCode,R.id.STeacher,R.id.HType,R.id.HClass,R.id.HStart,R.id.HEnd};
+	    private static String[] from2 = {"SName","SColor"};
+	    private static int[] to2 = {R.id.text1,R.id.colorLabel2};
 	    static int currentDay;
 
 	    private static EditText HClass;
@@ -78,7 +83,7 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
 	    private static Spinner SName;
 	    private static Spinner HDay;
 	    private static String selectedSubject;
-	    private static String colorVet[];
+	    private static String colorVet[],colo[];
 
 	    private static String OLDSName;
 	    private static String OLDHType;
@@ -111,10 +116,34 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
 		ActionBar Bar = getActionBar();
 		Bar.setLogo(R.drawable.ic_launcher_1);
 		//Bar.setTitle("");
+		 // String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/SASTRA Timetable/files/test.txt";
+		
+		 
+		 
+		 SharedPreferences mPreferences = this.getSharedPreferences("AB",MODE_PRIVATE);
+		 
+		 
+		 boolean firstTime = mPreferences.getBoolean("firstTime", true);
+		 if (firstTime) 
+		 {
+			 
+		     SharedPreferences.Editor editor = mPreferences.edit();
+		     editor.putBoolean("firstTime", false);
+		     editor.commit();
+		     Dialog d2 = new Dialog(this);
+           	d2.setTitle("HELP");
+           	d2.setCanceledOnTouchOutside(true);
+              	TextView tv = new TextView(this);
+           	tv.setText("This application can be used to store your timetable.First,click on Manage Subjects Icon(Wrench Icon) inorder to add all your subjects.Click on Add Subjects on top and enter the details of your subject.The fields that appear are optional and not manditory.Once you have added all the subjects,go back to the main screen and click on Add Classes icon(Plus Icon) to add the different classes to your timetable.The fields that appear are again optional and all of them need not be filled.You can long press on any particular subject to edit or delete them.You can delete all the informations using Delete All(Garbage Icon) option.");
+           	ScrollView sav = new ScrollView(this);
+           	sav.addView(tv);
+              	LayoutParams lap = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+              	d2.addContentView(sav,lap);
+              	d2.show();
+		 }
 		
 		
-		
-		boolean enabled = true;
+		 boolean enabled = true;
 		
 		Bar.setHomeButtonEnabled(enabled);
 		
@@ -226,11 +255,16 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
         fromDialog = new TimePickerDialog(this, fromTimeSetListener, 12, 0, true);
         toDialog = new TimePickerDialog(this, toTimeSetListener, 12, 0, true);
         
+        
+        //This place is important.
+        
         SName = (Spinner) addDialog.findViewById(R.id.SName);
         SName.setOnItemSelectedListener(new OnItemSelectedListener() {
 
             public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long id) {                    
-                 selectedSubject = arraySubjects[position];               
+                 selectedSubject = (String) arraySubjects[position];
+                 Log.d("AB","We are inside the setOnItemSelectedListener for Sname : 264");
+                 Log.d("AB",selectedSubject);
             }
 
 			public void onNothingSelected(AdapterView<?> arg0) {
@@ -330,7 +364,86 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
 	                return view;
 	            }
 	    }
+		
+
+		public class mySpinnerAdapter extends SimpleAdapter{
+	        
+			String[] colors;
+	        public mySpinnerAdapter(Context context, List<? extends Map<String, ?>> data,
+	        	int resource, String[] from, int[] to, String[] col) 
+	        {
+	            	super(context, data, resource, from, to);
+	            	Log.d("AB","And now we are in the constructor. :374");
+	                colors = col;
+	        	}
+	            @Override
+				public View getView(int position, View convertView, ViewGroup parent ) 
+	            {
+	            	Log.d("AB","We are inside getView :380");
+	            	Log.d("AB","This has been called already :"+String.valueOf(position));
+	            	Log.d("AB",colors[position]);
+	            	View view = super.getView(position, convertView, parent);
+	            	View label = view.findViewById(R.id.colorLabel2);
+	            	if(label.equals(null))
+	            	{
+	            		Log.d("AB","Null label!!");
+	            	}
+	                label.setBackgroundColor(Color.parseColor(colors[position]));
+	                return view;
+	            }
+	    }
 	
+		public class newSpinnerAdapter extends ArrayAdapter<String>
+{
+	        
+			//String[] colors;
+			
+			
+
+	        public newSpinnerAdapter(Context context, int textViewResourceId,String[] objects)
+	        {
+	        	
+	            super(context, textViewResourceId, objects);
+	            Log.d(TAG,"We are inside My Adapter now : 407");
+	        }
+	 
+	        @Override
+	        public View getDropDownView(int position, View convertView,ViewGroup parent) 
+	        {
+	        	Log.d(TAG,"We are inside getDropDownView now : 413");
+	            return getCustomView(position, convertView, parent);
+	        }
+	 
+	        @Override
+	        public View getView(int position, View convertView, ViewGroup parent) 
+	        {	
+	        	Log.d(TAG,"We are inside getView now : 420");
+	            return getCustomView(position, convertView, parent);
+	        }
+	 
+	        public View getCustomView(int position, View convertView, ViewGroup parent) 
+	        {
+	        	Log.d(TAG,"Custom View : 426");
+	            LayoutInflater inflater=getLayoutInflater();
+	            View row=inflater.inflate(R.layout.timetable_spinner_layout, parent, false);
+	            View label=(View)row.findViewById(R.id.colorLabel2);
+	            label.setBackgroundColor(Color.parseColor(colo[position]));
+	 
+	            TextView sub=(TextView)row.findViewById(R.id.text1);
+	            sub.setText(arraySubjects[position]);
+	 
+	           
+	            return row;
+	            }
+	      
+	    }
+	
+		
+		
+		
+		
+		
+		
 	  private int SDay2IDay(String selectedDay) {
 	    	
 	    	if(selectedDay.equals("Tuesday"))
@@ -396,6 +509,7 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
 	        menu.add(1, 1, 1, "Add Class").setIcon(android.R.drawable.ic_menu_add).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 	        menu.add(1, 2, 2, "Delete All").setIcon(android.R.drawable.ic_menu_delete).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 	        menu.add(1, 3, 3, "About").setIcon(android.R.drawable.ic_menu_info_details).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+	        menu.add(1,4,4,"Help").setIcon(android.R.drawable.ic_menu_help).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 	        return result;
 		
 	}
@@ -410,23 +524,51 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
 	            case 1:
 	            	action = "insert";
 	            	data.open();
-	            	ArrayList<HashMap<String, Object>> arrayS = data.selectSubjects();
+	            	ArrayList<HashMap<String, Object>> arrayS = data.selectSubjects2();
 	            	data.close();
 	            	arraySubjects = new String [arrayS.size()];
+	                colo = new String [arrayS.size()];
+	            	
 	                Iterator<HashMap<String, Object>> it = arrayS.iterator();
 	                int i = 0;
 	                while(it.hasNext()) {
 	                	HashMap<String, Object> hm = it.next();
 	                	arraySubjects[i] = hm.get("SName").toString();
+	                	colo[i] = hm.get("SColor").toString();
+	                	Log.d("AB","This is inside the onOptionsItemSelected Function :485");
+	                	Log.d("AB",arraySubjects[i]);
+	                	Log.d("AB",colo[i]);
 	                	i++;
 	                }
-	                Sarrayadapter = new ArrayAdapter<String>(this,
-	                		android.R.layout.simple_spinner_item, arraySubjects);
-	                Sarrayadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	                SName.setAdapter(Sarrayadapter);
+	                
+	                newSpinnerAdapter ma = new newSpinnerAdapter(TimetableActivity.this,R.id.text1,arraySubjects);
+	                SName.setAdapter(ma);
+	                
+	                //mySpinnerAdapter msa = new mySpinnerAdapter(this,arrayS,R.layout.timetable_spinner_layout,from2, to2,colo );
+	                //msa.setDropDownViewResource(R.layout.timetable_spinner_layout);
+	                //  SName.setAdapter(msa);
+	                
+	                
 	                addDialog.setTitle("Add Class");
 	            	addDialog.show();
 	            	
+//	            	data.open();
+//	            	results2 = data.selectSubjects2();
+//	            	data.close();
+//	            	colorVet2 = new String[results2.size()];
+//	        		 for(int i=0;i<results2.size();i++) {
+//	        	    	HashMap<String, Object> color = new HashMap<String, Object>();
+//	        	    	
+//	        	    	color = results2.get(i);
+//	        	    	colorVet2[i] = (String) color.get("SColor");
+//	        	    }
+//	                
+	            	
+	               // Sarrayadapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, arraySubjects);
+	                //Sarrayadapter = new ArrayAdapter<String>(this,R.layout.timetable_spinner_layout, arraySubjects);
+	                //Sarrayadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	                
+	              
 	            	break;
 	            case 2:
 	            	alert.show();
@@ -435,16 +577,28 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
 	            	
 	            	Dialog d = new Dialog(this);
 	            	d.setCanceledOnTouchOutside(true);
-	            	
+	            	d.setTitle("ABOUT");
 	               	TextView tv2 = new TextView(this);
-	            	tv2.setText("This application was developed by R.R.Arun Balaji,a student of SASTRA University.Special Thanks to J.Sivaguru from SASTRA.\n\nHelp :\n\nThis application can be used to store your timetable.First,click on Manage Subjects Icon(Wrench Icon) inorder to add all your subjects.Click on Add Subjects on top and enter the details of your subject.The fields that appear are optional and not manditory.Once you have added all the subjects,go back to the main screen and click on Add Classes icon(Plus Icon) to add the different classes to your timetable.The fields that appear are again optional and all of them need not be filled.You can long press on any particular subject to edit or delete them.You can delete all the informations using Delete All(Garbage Icon) option.\n\nLICENSE INFORMATION : \nSASTRA TimeTable\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.This program is distributed in the hope that it will be useful,but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU General Public License for more details.This program makes use of the following libary ViewPageIndicator licensed under Apache License 2.0 and modifies the StudentTimeTable application made by Mazzarelli Alessio and Hopstank,distributed under GNU GPL v3.");
+	            	tv2.setText("This application was developed by R.R.Arun Balaji,a student of SASTRA University.Special Thanks to J.Sivaguru from SASTRA.\n\nLICENSE INFORMATION : \nSASTRA TimeTable\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.This program is distributed in the hope that it will be useful,but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU General Public License for more details.This program makes use of the following libary ViewPageIndicator licensed under Apache License 2.0 and modifies the StudentTimeTable application made by Mazzarelli Alessio and Hopstank,distributed under GNU GPL v3.");
 	            	ScrollView sv = new ScrollView(this);
 	            	sv.addView(tv2);
 	               	LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
 	               	d.addContentView(sv,lp);
 	            	d.setTitle("About");
 	            	d.show();
-	            	
+	            	break;
+	            case 4:
+	            	Dialog d2 = new Dialog(this);
+	            	d2.setTitle("HELP");
+	            	d2.setCanceledOnTouchOutside(true);
+	               	TextView tv = new TextView(this);
+	            	tv.setText("This application can be used to store your timetable.\nFirst,click on Manage Subjects Icon(Wrench Icon) inorder to add all your subjects.Click on Add Subjects on top and enter the details of your subject.The fields that appear are optional and not manditory.\n\nOnce you have added all the subjects,go back to the main screen and click on Add Classes icon(Plus Icon) to add the different classes to your timetable.The fields that appear are again optional and all of them need not be filled.You can long press on any particular subject to edit or delete them.You can delete all the informations using Delete All(Garbage Icon) option.");
+	            	ScrollView sav = new ScrollView(this);
+	            	sav.addView(tv);
+	               	LayoutParams lap = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+	               	d2.addContentView(sav,lap);
+	               	d2.show();
+	            	break;
 	            
 	            
 	        }
@@ -474,25 +628,31 @@ public class TimetableActivity extends FragmentActivity implements OnClickListen
 	    	String endH = results.get(info.position).get("HEnd").toString();
 	    	
 	    	
-	    	switch (item.getItemId()) {
+	    	switch (item.getItemId()) 
+	    	{
 	        	case 1:
+	        		
 	        		action = "edit";
 	        		data.open();
 	            	ArrayList<HashMap<String, Object>> arrayS = data.selectSubjects();
 	            	data.close();
 	            	arraySubjects = new String [arrayS.size()];
+	            	colo = new String[arrayS.size()];
 	                Iterator<HashMap<String, Object>> it = arrayS.iterator();
 	                int i = 0;
 	                while(it.hasNext()) {
 	                	HashMap<String, Object> hm = it.next();
 	                	arraySubjects[i] = hm.get("SName").toString();
+	                	colo[i] = hm.get("SColor").toString();
 	                	i++;
 	                }
-	                Sarrayadapter = new ArrayAdapter<String>(this,
-	                		android.R.layout.simple_spinner_item, arraySubjects);
-	                Sarrayadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	                SName.setAdapter(Sarrayadapter);
-	        		SName.setSelection(Sarrayadapter.getPosition(course));
+	                
+	                newSpinnerAdapter maa = new newSpinnerAdapter(this,R.id.text1,arraySubjects);
+	                SName.setAdapter(maa);
+//	                Sarrayadapter = new ArrayAdapter<String>(this,R.layout.timetable_spinner_layout,arraySubjects);
+//	                Sarrayadapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//	                SName.setAdapter(Sarrayadapter);
+	        		SName.setSelection(maa.getPosition(course));
 	        		String dayS = IDay2SDay(day);
 	        		HDay.setSelection(arrayadapter.getPosition(dayS));
 	            	CharSequence fhour = startH.subSequence(0, 2);
